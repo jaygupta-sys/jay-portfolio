@@ -12,28 +12,38 @@ import HoverLinks from "./HoverLinks";
 const SocialIcons = () => {
   useEffect(() => {
     const social = document.getElementById("social") as HTMLElement;
+    if (!social) return;
+
+    const cleanupFns: (() => void)[] = [];
 
     social.querySelectorAll("span").forEach((item) => {
       const elem = item as HTMLElement;
       const link = elem.querySelector("a") as HTMLElement;
+      if (!link) return;
 
-      const rect = elem.getBoundingClientRect();
-      let mouseX = rect.width / 2;
-      let mouseY = rect.height / 2;
+      let rafId: number | null = null;
+      let mouseX = 0;
+      let mouseY = 0;
       let currentX = 0;
       let currentY = 0;
+      let isHovered = false;
 
       const updatePosition = () => {
-        currentX += (mouseX - currentX) * 0.1;
-        currentY += (mouseY - currentY) * 0.1;
+        currentX += (mouseX - currentX) * 0.15;
+        currentY += (mouseY - currentY) * 0.15;
 
         link.style.setProperty("--siLeft", `${currentX}px`);
         link.style.setProperty("--siTop", `${currentY}px`);
 
-        requestAnimationFrame(updatePosition);
+        if (isHovered || Math.abs(mouseX - currentX) > 0.1 || Math.abs(mouseY - currentY) > 0.1) {
+          rafId = requestAnimationFrame(updatePosition);
+        } else {
+          rafId = null;
+        }
       };
 
       const onMouseMove = (e: MouseEvent) => {
+        const rect = elem.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
@@ -44,16 +54,41 @@ const SocialIcons = () => {
           mouseX = rect.width / 2;
           mouseY = rect.height / 2;
         }
+
+        if (!rafId) {
+          rafId = requestAnimationFrame(updatePosition);
+        }
       };
 
-      document.addEventListener("mousemove", onMouseMove);
+      const onMouseEnter = () => {
+        isHovered = true;
+      };
 
-      updatePosition();
+      const onMouseLeave = () => {
+        isHovered = false;
+        const rect = elem.getBoundingClientRect();
+        mouseX = rect.width / 2;
+        mouseY = rect.height / 2;
+        if (!rafId) {
+          rafId = requestAnimationFrame(updatePosition);
+        }
+      };
 
-      return () => {
+      elem.addEventListener("mousemove", onMouseMove);
+      elem.addEventListener("mouseenter", onMouseEnter);
+      elem.addEventListener("mouseleave", onMouseLeave);
+
+      cleanupFns.push(() => {
+        if (rafId) cancelAnimationFrame(rafId);
         elem.removeEventListener("mousemove", onMouseMove);
-      };
+        elem.removeEventListener("mouseenter", onMouseEnter);
+        elem.removeEventListener("mouseleave", onMouseLeave);
+      });
     });
+
+    return () => {
+      cleanupFns.forEach((fn) => fn());
+    };
   }, []);
 
   return (
@@ -80,7 +115,7 @@ const SocialIcons = () => {
           </a>
         </span>
       </div>
-      <a className="resume-button" href="#">
+      <a className="resume-button" href="mailto:jaynirala82@gmail.com?subject=Resume%20Request" data-cursor="disable">
         <HoverLinks text="RESUME" />
         <span>
           <TbNotes />

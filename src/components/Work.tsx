@@ -6,68 +6,100 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(useGSAP);
 
+const projects = [
+  {
+    title: "Stage & Steel",
+    category: "Production E-Commerce Platform",
+    tools: "React.js, Checkout & Payment Workflow, Hosting, Domain, Maintenance",
+    link: "https://stageandsteel.in",
+    image: "/images/placeholder.webp",
+  },
+  {
+    title: "Adi's Cafe & Stays",
+    category: "Hospitality & Cafe Website",
+    tools: "Web Updates, Digital Management, Meta/Instagram Ads, SEO",
+    link: "https://adiscafeandstays.in",
+    image: "/images/placeholder.webp",
+  },
+  {
+    title: "Bagecha Rewards",
+    category: "Customer Loyalty Web App",
+    tools: "Firebase Auth, Firestore Database, Visit Tracking, Reward System",
+    link: "https://loyalty.bagechabyadis.in",
+    image: "/images/placeholder.webp",
+  },
+  {
+    title: "The Athletic Edge",
+    category: "Fitness & Training Platform",
+    tools: "Responsive Design, Services & Pricing, Schedules, Enquiry Flow",
+    link: "https://athleticedges.in",
+    image: "/images/placeholder.webp",
+  },
+];
+
 const Work = () => {
   useGSAP(() => {
-  let translateX: number = 0;
+    let translateX: number = 0;
+    function setTranslateX() {
+      const box = document.getElementsByClassName("work-box");
+      if (!box || box.length === 0) return;
+      const rectLeft = document
+        .querySelector(".work-container")!
+        .getBoundingClientRect().left;
+      const rect = box[0].getBoundingClientRect();
+      const parentWidth = box[0].parentElement!.getBoundingClientRect().width;
+      let padding: number =
+        parseInt(window.getComputedStyle(box[0]).padding) / 2;
+      translateX = rect.width * box.length - (rectLeft + parentWidth) + padding;
+    }
 
-  function setTranslateX() {
-    const box = document.getElementsByClassName("work-box");
-    const rectLeft = document
-      .querySelector(".work-container")!
-      .getBoundingClientRect().left;
-    const rect = box[0].getBoundingClientRect();
-    const parentWidth = box[0].parentElement!.getBoundingClientRect().width;
-    let padding: number =
-      parseInt(window.getComputedStyle(box[0]).padding) / 2;
-    translateX = rect.width * box.length - (rectLeft + parentWidth) + padding;
-  }
+    setTranslateX();
 
-  setTranslateX();
+    let timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".work-section",
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+        pin: true,
+        pinType: !ScrollTrigger.isTouch ? "transform" : "fixed",
+        id: "work",
+      },
+    });
 
-  let timeline = gsap.timeline({
-    scrollTrigger: {
-      trigger: ".work-section",
-      start: "top top",
-      end: `+=${translateX}`, // Use actual scroll width
-      scrub: true,
-      pin: true,
-      id: "work",
-    },
-  });
+    timeline.to(".work-flex", {
+      x: -translateX,
+      duration: 40,
+      delay: 0.2,
+    });
+  }, []);
 
-  timeline.to(".work-flex", {
-    x: -translateX,
-    ease: "none",
-  });
-
-  // Clean up (optional, good practice)
-  return () => {
-    timeline.kill();
-    ScrollTrigger.getById("work")?.kill();
-  };
-}, []);
   return (
     <div className="work-section" id="work">
       <div className="work-container section-container">
         <h2>
-          My <span>Work</span>
+          Selected <span>Projects</span>
         </h2>
         <div className="work-flex">
-          {[...Array(6)].map((_value, index) => (
+          {projects.map((project, index) => (
             <div className="work-box" key={index}>
               <div className="work-info">
                 <div className="work-title">
                   <h3>0{index + 1}</h3>
 
                   <div>
-                    <h4>Project Name</h4>
-                    <p>Category</p>
+                    <h4>{project.title}</h4>
+                    <p>{project.category}</p>
                   </div>
                 </div>
                 <h4>Tools and features</h4>
-                <p>Javascript, TypeScript, React, Threejs</p>
+                <p>{project.tools}</p>
               </div>
-              <WorkImage image="/images/placeholder.webp" alt="" />
+              <WorkImage
+                image={project.image}
+                alt={project.title}
+                link={project.link}
+              />
             </div>
           ))}
         </div>
