@@ -40,23 +40,22 @@ const projects = [
 const Work = () => {
   useGSAP(() => {
     function getTranslateX() {
+      const workFlex = document.querySelector(".work-flex") as HTMLElement;
+      const workContainer = document.querySelector(".work-container") as HTMLElement;
+      if (workFlex && workContainer) {
+        return Math.max(0, workFlex.scrollWidth - workContainer.clientWidth + 200);
+      }
       const box = document.getElementsByClassName("work-box");
       if (!box || box.length === 0) return 0;
-      const rectLeft = document
-        .querySelector(".work-container")!
-        .getBoundingClientRect().left;
       const rect = box[0].getBoundingClientRect();
-      const parentWidth = box[0].parentElement!.getBoundingClientRect().width;
-      let padding: number =
-        parseInt(window.getComputedStyle(box[0]).padding) / 2;
-      return Math.max(0, rect.width * box.length - (rectLeft + parentWidth) + padding);
+      return Math.max(0, (rect.width + 50) * box.length - window.innerWidth + 300);
     }
 
     let timeline = gsap.timeline({
       scrollTrigger: {
         trigger: ".work-section",
         start: "top top",
-        end: () => `+=${getTranslateX() + 200}`,
+        end: () => `+=${Math.max(getTranslateX() * 2 + 1000, 3000)}`,
         scrub: 1,
         pin: true,
         pinType: !ScrollTrigger.isTouch ? "transform" : "fixed",
@@ -71,6 +70,9 @@ const Work = () => {
       ease: "none",
       duration: 1,
     });
+
+    // Hold last project in view before unpinning to footer
+    timeline.to({}, { duration: 0.25 });
   }, []);
 
   return (
