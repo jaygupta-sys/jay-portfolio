@@ -39,10 +39,9 @@ const projects = [
 
 const Work = () => {
   useGSAP(() => {
-    let translateX: number = 0;
-    function setTranslateX() {
+    function getTranslateX() {
       const box = document.getElementsByClassName("work-box");
-      if (!box || box.length === 0) return;
+      if (!box || box.length === 0) return 0;
       const rectLeft = document
         .querySelector(".work-container")!
         .getBoundingClientRect().left;
@@ -50,27 +49,27 @@ const Work = () => {
       const parentWidth = box[0].parentElement!.getBoundingClientRect().width;
       let padding: number =
         parseInt(window.getComputedStyle(box[0]).padding) / 2;
-      translateX = rect.width * box.length - (rectLeft + parentWidth) + padding;
+      return Math.max(0, rect.width * box.length - (rectLeft + parentWidth) + padding);
     }
-
-    setTranslateX();
 
     let timeline = gsap.timeline({
       scrollTrigger: {
         trigger: ".work-section",
         start: "top top",
-        end: "bottom top",
-        scrub: true,
+        end: () => `+=${getTranslateX() + 200}`,
+        scrub: 1,
         pin: true,
         pinType: !ScrollTrigger.isTouch ? "transform" : "fixed",
         id: "work",
+        invalidateOnRefresh: true,
+        anticipatePin: 1,
       },
     });
 
     timeline.to(".work-flex", {
-      x: -translateX,
-      duration: 40,
-      delay: 0.2,
+      x: () => -getTranslateX(),
+      ease: "none",
+      duration: 1,
     });
   }, []);
 
