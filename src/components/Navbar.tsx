@@ -73,7 +73,7 @@ const Navbar = () => {
             </a>
           </li>
           <li>
-            <a data-href="#contact" href="#contact">
+            <a href="mailto:jaynirala82@gmail.com" data-cursor="disable">
               <HoverLinks text="CONTACT" />
             </a>
           </li>
