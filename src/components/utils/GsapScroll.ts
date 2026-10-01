@@ -63,10 +63,12 @@ export function setCharTimeline(
   let neckBone = character?.getObjectByName("spine005");
   if (window.innerWidth > 1024) {
     if (character) {
+      gsap.set(".character-model", { xPercent: -50, left: "50%" });
+
       tl1
         .fromTo(character.rotation, { y: 0 }, { y: 0.7, duration: 1 }, 0)
         .to(camera.position, { z: 22 }, 0)
-        .fromTo(".character-model", { x: 0 }, { x: "-25%", duration: 1 }, 0)
+        .fromTo(".character-model", { xPercent: -50, x: 0 }, { xPercent: -50, x: "-25%", duration: 1 }, 0)
         .to(".landing-container", { opacity: 0, duration: 0.4 }, 0)
         .to(".landing-container", { y: "40%", duration: 0.8 }, 0)
         .fromTo(".about-me", { y: "-50%" }, { y: "0%" }, 0);
@@ -81,8 +83,8 @@ export function setCharTimeline(
         .to(".about-section", { opacity: 0, delay: 3, duration: 2 }, 0)
         .fromTo(
           ".character-model",
-          { pointerEvents: "inherit" },
-          { pointerEvents: "none", x: "-12%", delay: 2, duration: 5 },
+          { pointerEvents: "inherit", xPercent: -50, x: "-25%" },
+          { pointerEvents: "none", xPercent: -50, x: "-12%", delay: 2, duration: 5 },
           0
         )
         .to(character.rotation, { y: 0.92, x: 0.12, delay: 3, duration: 3 }, 0)
